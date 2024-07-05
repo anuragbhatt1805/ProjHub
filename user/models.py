@@ -27,12 +27,12 @@ class UserManager(BaseUserManager):
         return user
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=150, unique=True)
-    name = models.CharField(max_length=150, null=True)
-    email = models.EmailField(max_length=255, unique=True, null=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+    username = models.CharField(max_length=150, unique=True, verbose_name='Username')
+    name = models.CharField(max_length=150, null=True, verbose_name='Full Name')
+    email = models.EmailField(max_length=255, unique=True, null=True, verbose_name='Email Address')
+    is_active = models.BooleanField(default=True, verbose_name='Active')
+    is_staff = models.BooleanField(default=False, verbose_name='Manager')
+    is_superuser = models.BooleanField(default=False, verbose_name='Admin')
 
     USERNAME_FIELD = 'username'
     objects = UserManager()
@@ -43,13 +43,13 @@ class PushRecord(models.Model):
         ('END', 'End'),
         ('RESUME', 'Resume'),
         ('SUSPEND', 'Suspend'),
-    ])
+    ], verbose_name='Record Type')
     timestamp = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
 
 class TaskRecord(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name='Task')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Employee')
 
     class Meta:
         unique_together = ('task', 'user')
