@@ -21,20 +21,20 @@ class Project(models.Model):
     name = models.CharField(max_length=255, blank=False, verbose_name='Project Name')
     description = models.TextField(blank=True, verbose_name='Project Description')
     manager = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='manager', verbose_name='Project Manager')
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name='Team')
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name='Team', blank=True, null=True,)
     fabricator = models.ForeignKey(Fabricator, on_delete=models.CASCADE, related_name='fabricator', verbose_name='Fabricator')
     startDate = models.DateTimeField(verbose_name='Start Date')
     endDate = models.DateTimeField(null=True, verbose_name='End Date')
-    status = models.CharField(max_length=55, default='active', choices=[
-        ('active', 'Active'),
-        ('on-hold', 'On-Hold'),
-        ('inactive', 'Inactive'),
-        ('delayed', 'Delayed'),
-        ('reopened', 'Reopened'),
-        ('completed', 'Completed'),
-        ('submitted', 'Submitted'),
-        ('suspended', 'Suspended'),
-        ('cancelled', 'Cancelled'),
+    status = models.CharField(max_length=55, default='ACTIVE', choices=[
+        ('ACTIVE', 'Active'),
+        ('ON-HOLD', 'On-Hold'),
+        ('INACTIVE', 'Inactive'),
+        ('DELAY', 'Delay'),
+        ('REOPEN', 'Reopened'),
+        ('COMPLETE', 'Complete'),
+        ('SUBMIT', 'Submit'),
+        ('SUSPEND', 'Suspend'),
+        ('CANCEL', 'Cancel'),
     ], blank=True, null=True, verbose_name='Project Status')
     stage = models.CharField(max_length=55, default='IFA', choices=[
         ('IFA', 'Issue for Approval'),
