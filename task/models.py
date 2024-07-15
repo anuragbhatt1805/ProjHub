@@ -34,6 +34,7 @@ class AssignedList(models.Model):
     comment = models.TextField(blank=True, verbose_name='Comment on Approval')
     objects = models.Manager()
 
+
 class TaskPriority(models.IntegerChoices):
     LOW = 0, 'Low'
     NORMAL = 1, 'Normal'
@@ -59,8 +60,6 @@ class TaskManager(models.Manager):
         )
         
         return task  # Return the created task object
-
-
 
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name='Project')
