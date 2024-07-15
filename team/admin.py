@@ -1,56 +1,60 @@
 from django.contrib import admin
-from django.db.models import Count
-from team.models import (
-    Team,
-    Member
-)
-
-class MemberCountFilter(admin.SimpleListFilter):
-    title = 'Member Count'
-    parameter_name = 'member_count'
-
-    def lookups(self, request, model_admin):
-        return [
-            ('0', '0 Members'),
-            ('1-5', '1-5 Members'),
-            ('6-10', '6-10 Members'),
-            ('11+', '11 or more Members'),
-        ]
-
-    def queryset(self, request, queryset):
-        if self.value() == '0':
-            return queryset.annotate(member_count=Count('members')).filter(member_count=0)
-        elif self.value() == '1-5':
-            return queryset.annotate(member_count=Count('members')).filter(member_count__range=(1, 5))
-        elif self.value() == '6-10':
-            return queryset.annotate(member_count=Count('members')).filter(member_count__range=(6, 10))
-        elif self.value() == '11+':
-            return queryset.annotate(member_count=Count('members')).filter(member_count__gt=10)
-        else:
-            return queryset
+from team.models import Team, Member
 
 class TeamAdmin(admin.ModelAdmin):
     def get_member_count(self, obj):
-        return obj.members.count()
+        return obj.get_members_count()
+    
     get_member_count.short_description = 'No of Team Members'
-
+    
     list_display = ('name', 'created_by', 'leader', 'get_member_count')
-    list_filter = (MemberCountFilter, 'created_by', 'leader')
-    search_fields = ('name', 'created_by', 'leader')
+    list_filter = ('created_by', 'leader')
+    search_fields = ('name', 'created_by__username', 'leader__username')
     ordering = ['created_at', 'name']
-    readonly_fields = ('created_at',)
+    readonly_fields = ('created_at', 'created_by')
     fieldsets = (
         ('Team Information', {
             'fields': ('name', 'created_by', 'leader')
-        }),
-        ('Members', {
-            'fields': ('members',)
         }),
         ('Timestamps', {
             'fields': ('created_at',)
         })
     )
 
+    def save_model(self, request, obj, form, change):
+        if not request.user.is_staff or not request.user.is_superuser:
+            return False
+        if not change:
+            team = Team.objects.create(
+                name=form.cleaned_data['name'],
+                created_by=request.user,
+                leader=form.cleaned_data['leader']
+            )
+            team.save()
+            return team
+
+class MemberAdmin(admin.ModelAdmin):
+    def get_team_name(self, obj):
+        return obj.team.name
+    get_team_name.short_description = 'Team'
+
+    def get_employee_name(self, obj):
+        return obj.employee.name
+    get_employee_name.short_description = 'Employee'
+
+    list_display = ('id', 'get_team_name', 'role', 'get_employee_name')
+    list_filter = ['team__name', 'role']
+    search_fields = ( 'employee', 'team__name')
+    ordering = ['id', 'team__name', 'employee__username']
+    fieldsets = [
+        ('Team Information', {
+            'fields': ('team', )
+        }),
+        ('Member Information', {
+            'fields': ('role', 'employee')
+        }),
+    ]
+
 
 admin.site.register(Team, TeamAdmin)
-admin.site.register(Member)
+admin.site.register(Member, MemberAdmin)

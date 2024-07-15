@@ -11,8 +11,10 @@ def uploadFile(instance, filename):
 
 
 class ProjectFile(models.Model):
+    project = models.ForeignKey('Project', on_delete=models.CASCADE, verbose_name='project')
     detail = models.CharField(max_length=255, blank=True, null=True)
     file = models.FileField(upload_to=uploadFile, null=True)
+    objects = models.Manager()
 
 class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -44,7 +46,24 @@ class Project(models.Model):
         ('RIF', 'Request for Information'),
         ('REV', 'Revision'),
     ], blank=True, null=True, verbose_name='Project Stage')
-    files = models.ManyToManyField(ProjectFile, blank=True, verbose_name='Project Files')
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True  )
     objects = models.Manager()
+
+    def get_all_files(self):
+        return ProjectFile.objects.filter(project=self)
+    
+    def add_file(self, file, caption=None):
+        file = ProjectFile.objects.create(
+            project=self,
+            detail=caption,
+            file=file,
+        )
+        file.save()
+        return file
+    
+    def get_file_count(self):
+        return ProjectFile.objects.filter(project=self).count()
+
+    def __str__(self):
+        return self.name

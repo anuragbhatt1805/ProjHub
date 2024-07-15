@@ -9,12 +9,8 @@ from task.models import Task
 
 class UserManager(BaseUserManager):
     def create_user(self, password=None, **kwargs):
-        # if not email:
-        #     raise ValueError('Users must have an email address')
         kwargs['email'] = self.normalize_email(kwargs.get('email'))
         user = self.model(**kwargs)
-        print(kwargs)
-        print(password)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -38,6 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
 class PushRecord(models.Model):
+    record = models.ForeignKey('TaskRecord', on_delete=models.CASCADE)
     type = models.CharField(max_length=255, blank=False, choices=[
         ('START', 'Start'),
         ('END', 'End'),
@@ -47,12 +44,69 @@ class PushRecord(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
 
+
 class TaskRecord(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name='Task')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Employee')
 
     class Meta:
         unique_together = ('task', 'user')
-    punch = models.ForeignKey(PushRecord, on_delete=models.CASCADE)
 
     objects = models.Manager()
+
+    def add_start_punch(self):
+        punch = PushRecord.objects.create(record=self, type='START')
+        task = Task.objects.get(self.task)
+        task.status = 'IN-PROGRESS'
+        task.save()
+        punch.save()
+        return punch
+    
+    def add_end_punch(self):
+        punch = PushRecord.objects.create(record=self, type='END')
+        task = Task.objects.get(self.task)
+        task.status = 'IN-REVIEW'
+        task.save()
+        punch.save()
+        return punch
+    
+    def add_resume_punch(self):
+        punch = PushRecord.objects.create(record=self, type='RESUME')
+        punch.save()
+        return punch
+    
+    def add_suspend_record(self):
+        punch = PushRecord.objects.create(record=self, type='SUSPEND')
+        punch.save()
+        return punch
+    
+    def get_punches(self):
+        return PushRecord.objects.filter(record=self).order_by('timestamp')
+    
+    def get_total_time(self):
+        punches = self.get_punches()
+        if len(punches) == 0:
+            return 0
+        else:
+            start_time = None
+            end_time = None
+            total_time = 0
+
+            for punch in punches:
+                if punch.type == 'START':
+                    start_time = punch.timestamp
+                elif punch.type == 'END':
+                    end_time = punch.timestamp
+                elif punch.type == 'SUSPEND':
+                    end_time = punch.timestamp
+                    if start_time and end_time:
+                        total_time += (end_time - start_time).total_seconds()
+                    start_time = None
+                    end_time = None
+                elif punch.type == 'RESUME':
+                    start_time = punch.timestamp
+
+            if start_time and end_time:
+                total_time += (end_time - start_time).total_seconds()
+
+            return total_time

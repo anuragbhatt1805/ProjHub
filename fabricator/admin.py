@@ -5,8 +5,7 @@ class FabricatorAdmin(admin.ModelAdmin):
     ordering = ['fabName', 'contactPerson',]
     search_fields = ['fabName', 'contactPerson', 'contactPhone']
     list_display = ['fabName', 'contactPerson', 'contactPhone', 'contactCountry']
-    list_filter = ['contactCountry', 'contactState', 'contactCity', 'contactPerson']
-    # readonly_fields = ['created', 'updated']
+    list_filter = ['contactCountry', 'contactState', 'contactCity', 'contactPerson']    
     fieldsets = (
         ('Fabricator', {
             'fields': ['fabName']
@@ -16,20 +15,6 @@ class FabricatorAdmin(admin.ModelAdmin):
         }),
         ('Contract Details', {
             'fields': ['contract']
-        })
-    )
-    add_fieldsets = (
-        ('Add Fabricator', {
-            'classes': ('wide',),
-            'fields': ['fabName']
-        }),
-        ('Add Contact Person Information', {
-            'classes': ('wide',),
-            'fields': ['contactPerson', 'contactPhone', 'contactCountry', 'contactState', 'contactCity']
-        }),
-        ('Add Contract Details', {
-            'classes': ('collapse',),
-            'fields': ['contract'],
         })
     )
 
