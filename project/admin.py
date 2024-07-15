@@ -19,24 +19,29 @@ class ProjectAdmin(admin.ModelAdmin):
 
     ordering = ['created_at', 'name']
     list_display = [ 'name', 'get_fab_name', 'get_manager_name', 'get_team_name', 'endDate', 'status', 'stage']
-    search_fields = ['name', 'description', 'manager__username', 'fabricator__fabName', 'team__name']
-    list_filter = ['status', 'stage', 'startDate', 'endDate', 'manager__username', 'fabricator__fabName', 'team__name']
+    search_fields = ['name', 'description', 'manager__name', 'fabricator__fabName', 'team__name']
+    list_filter = ['status', 'stage', 'startDate', 'endDate', 'manager__name', 'fabricator__fabName', 'team__name']
     readonly_fields = ['created_at', 'updated_at',]
     fieldsets = [
         ('Project Information', {'fields': [
-            'name', 'description', ]
+            'name', 'description', ],
+            'classes': ('wide',),
         }),
         ('Project Members', {'fields': [
-            'manager', 'team', 'fabricator', ]
+            'manager', 'team', 'fabricator', ],
+            'classes': ('wide',),
         }),
         ('Project Dates', {'fields': [
-            'startDate', 'endDate', ]
+            'startDate', 'endDate', ],
+            'classes': ('wide',),
         }),
         ('Project Status', {'fields': [
-            'status', 'stage'
-        ]}),
+            'status', 'stage'],
+            'classes': ('wide',),
+        }),
         ('Files', {'fields':
-             ['files', ]
+             ['files', ],
+             'classes': ('wide',),
         }),
         ('Timestamps', {'fields': ['created_at', 'updated_at']}),
     ]

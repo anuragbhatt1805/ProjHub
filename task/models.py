@@ -31,21 +31,35 @@ class AssignedList(models.Model):
     comment = models.TextField(blank=True, verbose_name='Comment on Approval')
     objects = models.Manager()
 
+class TaskPriority(models.IntegerChoices):
+    LOW = 0, 'Low'
+    NORMAL = 1, 'Normal'
+    HIGH = 2, 'High'
+    CRITICAL = 3, 'Critical'
 
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name='Project')
     fabricator = models.ForeignKey(Fabricator, on_delete=models.CASCADE, verbose_name='Fabricator')
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, verbose_name='Parent Task')
-    child = models.ManyToManyField('self', blank=True, verbose_name='Child Task')
     name = models.CharField(max_length=255, blank=False, verbose_name='Title')
     description = models.TextField(blank=True, verbose_name='Description')
-    status = models.CharField(max_length=255, blank=False, verbose_name='Status')
-    priority = models.IntegerField(blank=False, verbose_name='Priority')
+    status = models.CharField(max_length=255, blank=False, verbose_name='Status', choices=[
+        ('ASSINGED', 'Assigned'),
+        ('ON-HOLD', 'On-Hold'),
+        ('BREAK', 'Break'),
+        ('APPROVED', 'Approved'),
+        ('COMPLETE', 'Completed')
+    ], default='ASSIGNED')
+    attachment = models.FileField(upload_to=uploadTaskFile, null=True, blank=True, verbose_name='Attachment')
+    priority = models.IntegerField(blank=False, verbose_name='Priority', choices=TaskPriority.choices, default=TaskPriority.NORMAL)
     created_on = models.DateTimeField(auto_now_add=True)
-    due_date = models.DateField(null=True, blank=True, verbose_name='Due Date')
+    due_date = models.DateField(verbose_name='Due Date')
     duration = models.DurationField(verbose_name='Duration')
     comments = models.ManyToManyField(TaskComment, blank=True, verbose_name='Comments')
     assignes = models.ManyToManyField(AssignedList, blank=True, verbose_name='Assign List')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Current Assigne')
 
     objects = models.Manager()
+
+    def get_child_tasks(self):
+        return Task.objects.filter(parent=self)
