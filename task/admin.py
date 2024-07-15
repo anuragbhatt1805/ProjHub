@@ -5,6 +5,9 @@ from task.models import (
     AssignedList
 )
 
+class TaskAdmin(admin.ModelAdmin):
+    pass
+
 
 # Register your models here.
 admin.site.register(TaskComment)
