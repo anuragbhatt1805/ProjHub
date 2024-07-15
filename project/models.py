@@ -18,7 +18,7 @@ class ProjectFile(models.Model):
 
 class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=255, blank=False, verbose_name='Project Name')
+    name = models.CharField(max_length=255, blank=False, verbose_name='Project Name', unique=True)
     description = models.TextField(blank=True, verbose_name='Project Description')
     manager = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='manager', verbose_name='Project Manager')
     team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name='Team', blank=True, null=True,)

@@ -20,7 +20,7 @@ class TaskComment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Commented By')
     created_on = models.DateTimeField(auto_now_add=True, verbose_name='Commented On')
     data = models.TextField(blank=True, verbose_name='Comment')
-    file = models.FileField(upload_to=uploadCommentFile, null=True, verbose_name='Attachment')
+    file = models.FileField(upload_to=uploadCommentFile, null=True, verbose_name='Attachment', blank=True)
     objects = models.Manager()
 
 class AssignedList(models.Model):
@@ -41,10 +41,26 @@ class TaskPriority(models.IntegerChoices):
     CRITICAL = 3, 'Critical'
 
 class TaskManager(models.Manager):
-    def create(self, **kwargs):
-        project = Project.objects.get(kwargs['project'])
-        kwargs['fabricator'] = project.fabricator
-        return super().create(**kwargs)
+    def create(self, assigned_by, **kwargs):
+        project_obj = Project.objects.get(pk=kwargs['project'])
+        
+        kwargs['fabricator'] = project_obj.fabricator
+        
+        task = self.model(**kwargs)
+        task.save()
+        
+        task.add_assignes(
+            assigned_by=assigned_by,
+            assigned_to=kwargs.get('user'),
+            approved_by=assigned_by,
+            approved_on=datetime.now(),
+            approved=True,
+            comment=None
+        )
+        
+        return task  # Return the created task object
+
+
 
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name='Project')
@@ -68,7 +84,7 @@ class Task(models.Model):
     duration = models.DurationField(verbose_name='Duration')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Current Assigne')
 
-    objects = models.Manager()
+    objects = TaskManager()
 
     def get_child_tasks(self):
         return Task.objects.filter(parent=self)

@@ -39,7 +39,24 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
+class RecordAdmin(admin.ModelAdmin):
+    def get_total_time(self, obj):
+        time = obj.get_total_time()
+        hrs = int(time / 3600)
+        mint = int((time % 3600) / 60)
+        sec = int((time % 3600) % 60)
+        return f'{hrs}:{mint}:{sec}'
+    get_total_time.short_description = 'Total Time Taken'
+
+    def task_duration(self, obj):
+        return obj.task.duration
+    task_duration.short_description = 'Assigned Time'
+    
+    list_display = ['task', 'user', 'get_total_time', 'task_duration']
+    search_fields = ['task', 'user']
+    list_filter = ['task', 'user']
+
 # admin.site.register(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(TaskRecord)
+admin.site.register(TaskRecord, RecordAdmin)
 admin.site.register(PushRecord)
