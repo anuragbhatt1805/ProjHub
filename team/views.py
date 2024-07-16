@@ -5,18 +5,13 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.authentication import TokenAuthentication
 from team.permissions import IsSuperuserOrReadOnly
-from team.models import (
-    Team, Member
-)
-from team.serializers import (
-    MemberSerializer,
-    TeamSerializer,
-    TeamDetailSerializer
-)
+from team.models import Team, Member
+from user.models import User
+from team.serializers import MemberSerializer, TeamSerializer, TeamDetailSerializer
 
 class TeamMemberViewSet(ReadOnlyModelViewSet):
     queryset = Member.objects.all()
-    authentication_classes = [TokenAuthentication, ]
+    authentication_classes = [TokenAuthentication]
     serializer_class = MemberSerializer
     permission_classes = [IsAuthenticated, IsSuperuserOrReadOnly]
 
@@ -28,9 +23,9 @@ class TeamMemberViewSet(ReadOnlyModelViewSet):
         return queryset
     
 class TeamViewSet(ModelViewSet):
-    queryset = Member.objects.all()
+    queryset = Team.objects.all()
     serializer_class = TeamSerializer
-    authentication_classes = [TokenAuthentication, ]
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsSuperuserOrReadOnly]
 
     def get_serializer_class(self):
@@ -59,20 +54,22 @@ class TeamViewSet(ModelViewSet):
             'role': role
         })
         if serializer.is_valid():
-            team.add_member(role, employee)
+            team.add_member(role, User.objects.get(pk=employee))
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    @action(detail=True, methods=['get'])
-    def remove_member(self, request, pk=None):
+    @action(detail=True, methods=['get'], url_path='remove_member/(?P<member_id>[^/.]+)')
+    def remove_member(self, request, pk=None, member_id=None):
         team = self.get_object()
-        employee = request.query_params.get('employee')
-        team.remove_member(employee)
+        member = team.remove_member(member_id)
+        if not member:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    @action(detail=True, methods=['get'])
-    def member_role(self, request, pk=None):
+    @action(detail=True, methods=['get'], url_path='member_role/(?P<member_id>[^/.]+)')
+    def member_role(self, request, pk=None, member_id=None):
         team = self.get_object()
-        employee = request.query_params.get('employee')
-        role = team.get_member_role(employee)
+        role = team.get_member_role(member_id)
+        if not role:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(role)

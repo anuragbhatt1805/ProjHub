@@ -24,6 +24,7 @@ class TeamManager(models.Manager):
 
     def create(self, **kwargs):
         team = self.model(**kwargs)
+        team.save()
         leadMember = Member.objects.create(
             team = team,
             role = 'LEADER',
@@ -63,9 +64,9 @@ class Team(models.Model):
         return self.get_members().count()
     
     def get_member_role(self, employee):
-        return Member.objects.filter(team=self, employee=employee).first().role
+        return Member.objects.get(id=employee).role
     
     def remove_member(self, employee):
-        member = Member.objects.filter(team=self, employee=employee).first()
+        member = Member.objects.get(id=employee)
         member.delete()
         return member
