@@ -11,6 +11,6 @@ class UpdateOwnProfile(permissions.BasePermission):
         return obj.id == request.user.id
 
     def has_permission(self, request, view):
-            if request.method == 'POST' and not request.user.is_superuser:
-                return False
-            return True
+        if request.method == 'POST' and not request.user.is_superuser:
+            return False
+        return True

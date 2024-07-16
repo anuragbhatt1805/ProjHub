@@ -22,6 +22,11 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/user/', include('user.urls')),
+    # path('api/task/', include('task.urls')),
+    # path('api/team/', include('team.urls')),
+    path('api/fabricator/', include('fabricator.urls')),
+    # path('api/project/', include('project.urls')),
+    # path('api/project/upload/', include('project.upload_urls')),
 ]
 
 if settings.DEBUG:
