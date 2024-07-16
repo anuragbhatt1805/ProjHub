@@ -25,7 +25,7 @@ urlpatterns = [
     # path('api/task/', include('task.urls')),
     # path('api/team/', include('team.urls')),
     path('api/fabricator/', include('fabricator.urls')),
-    # path('api/project/', include('project.urls')),
+    path('api/project/', include('project.urls')),
     # path('api/project/upload/', include('project.upload_urls')),
 ]
 
