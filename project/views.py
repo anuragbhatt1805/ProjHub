@@ -1,8 +1,9 @@
-from rest_framework import viewsets, status, filters
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter
+from rest_framework.authentication import TokenAuthentication
 from project.models import Project, ProjectFile
 from project.serializers import (
     ProjectSerializer, ProjectFileSerializer,
@@ -13,6 +14,7 @@ from project.permissions import IsSuperuserOrReadOnly
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    authentication_classes = [TokenAuthentication, ]
     permission_classes = [IsAuthenticated, IsSuperuserOrReadOnly, ]
     filter_backends = [SearchFilter, ]
     search_fields = ['name', 'description', 'manager', 'team', 'fabricator', 'status', 'stage']
@@ -52,6 +54,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 class ProjectFileViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ProjectFile.objects.all()
+    authentication_classes = [TokenAuthentication, ]
     serializer_class = ProjectFileSerializer
     permission_classes = [IsAuthenticated, IsSuperuserOrReadOnly]
 

@@ -46,9 +46,6 @@ class Team(models.Model):
     leader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='team_leader', verbose_name='Team Leader')
     created_at = models.DateTimeField(auto_now_add=True)
     objects = TeamManager()
-
-    def __str__(self):
-        return self.name
     
     def get_members(self):
         return Member.objects.filter(team=self)
