@@ -25,6 +25,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if self.action == 'retrieve':
             return ProjectDetailSerializer
         return super().get_serializer_class()
+    
+    def get_queryset(self):
+        if self.request.user.is_superuser or self.request.user.is_staff:
+            return super().get_queryset()
+        else:
+            # TODO: fetch members
+            # TODO: fetch Team
+            # TODO: fetch Project
+            return super().get_queryset()
 
     @action(detail=True, methods=['get'])
     def files(self, request, pk=None):
