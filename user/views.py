@@ -50,6 +50,8 @@ class TaskRecordViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return TaskRecordDetailSerializer
+        if self.action in ['start', 'end', 'resume', 'pause', 'punches']:
+            return PunchRecordSerializer
         return super().get_serializer_class()
     
     @action(detail=True, methods=['get', 'post'])

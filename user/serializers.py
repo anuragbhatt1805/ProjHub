@@ -36,7 +36,7 @@ class PunchRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = PushRecord
         fields = '__all__'
-        read_only_fields = ['id', 'record']
+        read_only_fields = ['id', 'record', 'timestamp']
 
 class TaskRecordSerializer(serializers.ModelSerializer):
     class Meta:
