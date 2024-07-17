@@ -44,7 +44,6 @@ class PushRecord(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
 
-
 class TaskRecord(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name='Task')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Employee')
