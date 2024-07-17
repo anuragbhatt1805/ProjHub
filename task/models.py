@@ -34,6 +34,15 @@ class AssignedList(models.Model):
     comment = models.TextField(blank=True, verbose_name='Comment on Approval', null=True)
     objects = models.Manager()
 
+    def confirm(self, approved_by, comment=None):
+        self.approved_by = approved_by
+        self.approved_on = datetime.now()
+        if comment:
+            self.comment = comment
+        self.approved = True
+        self.save()
+        return self
+
 
 class TaskPriority(models.IntegerChoices):
     LOW = 0, 'Low'

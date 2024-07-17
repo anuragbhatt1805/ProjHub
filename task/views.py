@@ -43,7 +43,13 @@ class AssignedListViewSet(viewsets.ReadOnlyModelViewSet):
     def confirm(self, request, pk=None):
         if not request.user.is_staff:
             return Response({'detail': 'Permission Denied'}, status=status.HTTP_403_FORBIDDEN)
-        pass
+        assign = self.get_object()
+        if assign.approved:
+            return Response({'detail': 'Already Confirmed'}, status=status.HTTP_400_BAD_REQUEST)
+        comment = request.data.get('comment')
+        assign.confirm(approved_by=request.user, comment=comment)
+        res = AssignedListSerializer(assign).data
+        return Response(res, status=status.HTTP_200_OK)  
 
 
 class TaskViewSet(viewsets.ModelViewSet):
