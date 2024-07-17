@@ -27,11 +27,11 @@ class AssignedList(models.Model):
     task = models.ForeignKey('Task', on_delete=models.CASCADE, verbose_name='Task')
     assigned_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='assigned_by', verbose_name='Assigned By')
     assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='assigned_to', verbose_name='Assigned To')
-    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='approved_by', verbose_name='Approved By')
+    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='approved_by', verbose_name='Approved By', blank=True, null=True)
     approved_on = models.DateTimeField(auto_now=True, verbose_name='Approved On')
     assigned_on = models.DateTimeField(auto_now_add=True, verbose_name='Assigned On')
     approved = models.BooleanField(default=False, verbose_name='Approval Status')
-    comment = models.TextField(blank=True, verbose_name='Comment on Approval')
+    comment = models.TextField(blank=True, verbose_name='Comment on Approval', null=True)
     objects = models.Manager()
 
 
@@ -43,7 +43,7 @@ class TaskPriority(models.IntegerChoices):
 
 class TaskManager(models.Manager):
     def create(self, assigned_by, **kwargs):
-        project_obj = Project.objects.get(pk=kwargs['project'])
+        project_obj = Project.objects.get(pk=kwargs['project'].id)
         
         kwargs['fabricator'] = project_obj.fabricator
         
@@ -113,13 +113,15 @@ class Task(models.Model):
         assignList.approved = True
         assignList.comment = extra_kwargs.get('comment', assignList.comment)
         assignList.save()
+        self.user = assignList.assigned_to
+        self.save()
         return assignList
     
     def add_comment(self, user, data, file=None):
         comment = TaskComment.objects.create(
             task = self,
             user = user,
-            comment = data,
+            data = data,
             file = file,
         )
         comment.save()

@@ -32,6 +32,12 @@ class UserModelViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', 'username', 'email', 'is_staff', 'is_superuser')
 
+    @action(detail=False, methods=['get', 'post', 'put', 'delete', 'patch'])
+    def me(self, request, pk=None):
+        user = request.user
+        serializer = UserSerializer(user).data
+        return Response(serializer, status=status.HTTP_200_OK)
+
 
 class PunchRecordViewSet(viewsets.ModelViewSet):
     serializer_class = PunchRecordSerializer
