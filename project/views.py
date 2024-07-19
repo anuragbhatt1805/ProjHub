@@ -10,6 +10,7 @@ from project.serializers import (
     ProjectDetailSerializer
 ) 
 from project.permissions import IsSuperuserOrReadOnly
+from team.models import Team, Member
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
@@ -30,10 +31,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if self.request.user.is_superuser or self.request.user.is_staff:
             return super().get_queryset()
         else:
-            # TODO: fetch members
-            # TODO: fetch Team
-            # TODO: fetch Project
-            return super().get_queryset()
+            members = Member.objects.filter(employee=self.request.user)
+            team_ids = set([member.team for member in members])
+            projects = Project.objects.filter(team__in=team_ids)
+            if projects.count() > 0:
+                return projects
+            return []
 
     @action(detail=True, methods=['get'])
     def files(self, request, pk=None):

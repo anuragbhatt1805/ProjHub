@@ -13,6 +13,7 @@ from task.serializers import (
 )
 from user.models import TaskRecord, User
 from user.serializers import TaskRecordDetailSerializer
+from datetime import date as today
 
 
 class CommentViewSet(viewsets.ReadOnlyModelViewSet):
@@ -61,7 +62,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     search_fields = ['fabricator', 'project', 'status', 'priority', 'due_date', 'duration', 'user', 'parent', 'name', 'description', ]
 
     def get_serializer_class(self):
-        if self.action == 'retrieve':
+        if self.action == 'retrieve' or self.action == 'my_task':
             return TaskDetailSerializer
         elif self.action == 'add_comment':
             return CommentSerializer
@@ -148,3 +149,18 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         res = AssignedListSerializer(assignList).data
         return Response(res, status=status.HTTP_201_CREATED)
+    
+    @action(detail=False, methods=['get', ])
+    def calender(self, request, pk=None):
+        queryset = self.get_queryset()
+        date = request.query_params.get('date', today.today())
+        user = request.query_params.get('user', None)
+        if not user:
+            user = request.user
+        else:
+            user = User.objects.filter(
+                username__in=[user, f'WBT-{user}', f'wbt-{user}']
+            ).first()
+        queryset = queryset.filter(user=user, created_on__lte=date, due_date__gte=date)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
