@@ -74,7 +74,6 @@ class UserModelViewSet(viewsets.ModelViewSet):
                             is_superuser=True if row['role'].lower() == 'admin' else False,
                             is_staff=True if (row['role'].lower() == 'manager' or row['role'].lower() == 'admin') else False
                         )
-                        pass
                 return Response(status=status.HTTP_201_CREATED)
             except FileNotFoundError:
                 return Response({'error': 'CSV file not found'}, status=status.HTTP_400_BAD_REQUEST)

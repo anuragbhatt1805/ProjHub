@@ -22,6 +22,16 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = '__all__'
         read_only_fields = ['id', 'created_at', 'updated_at']
+    
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['manager'] = UserSerializer(User.objects.get(pk=response['manager'])).data
+        response['fabricator'] = FabricatorSerializer(Fabricator.objects.get(pk=response['fabricator'])).data
+        response['fabricator'].pop('contract')
+        if response['team']:
+            team = Team.objects.get(pk=response['team'])
+            response['leader'] = UserSerializer(team.leader).data
+        return response
 
 class ProjectDetailSerializer(ProjectSerializer):
 
