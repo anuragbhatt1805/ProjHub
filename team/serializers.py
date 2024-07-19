@@ -32,7 +32,7 @@ class TeamDetailSerializer(ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ['id', 'created_by', 'leader', 'created_at', ]
+        fields = '__all__'
         read_only_fields = ['id', 'created_at']
 
     def to_representation(self, instance):
