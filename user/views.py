@@ -1,10 +1,13 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
+from django.http import FileResponse
 from rest_framework.decorators import action
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
+from django.core.exceptions import ValidationError
+import csv, os
 from user.models import (
     User, PushRecord, TaskRecord
 )
@@ -15,7 +18,8 @@ from user.serializers import (
     UserSerializer,
     PunchRecordSerializer,
     TaskRecordSerializer,
-    TaskRecordDetailSerializer
+    TaskRecordDetailSerializer,
+    CSVFileSerializer
 )
 
 
@@ -32,11 +36,52 @@ class UserModelViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', 'username', 'email', 'is_staff', 'is_superuser')
 
+    def get_serializer_class(self):
+        if self.action == 'add_csv' or self.action == 'get_sample_csv':
+            return CSVFileSerializer
+        return super().get_serializer_class()
+
     @action(detail=False, methods=['get', 'post', 'put', 'delete', 'patch'])
     def me(self, request, pk=None):
         user = request.user
         serializer = UserSerializer(user).data
         return Response(serializer, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['get'])
+    def get_sample_csv(self, request, pk=None):
+        file_path = os.path.join(os.getcwd(), 'static', 'temp', 'user_sample.csv')
+        return FileResponse(
+            open(file_path, 'rb'),
+            filename='Sample User CSV File.csv',
+            as_attachment=True,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=False, methods=['post', 'get'])
+    def add_csv(self, request, pk=None):
+        serializer = CSVFileSerializer(data=request.data)
+        if serializer.is_valid():
+            file_path = serializer.save()
+            try:
+                with open(file_path, 'r') as file:
+                    reader = csv.DictReader(file)
+                    for row in reader:
+                        User.objects.create(
+                            username=row['username'], 
+                            email=row['email'], 
+                            name=row['name'],
+                            is_superuser=True if row['role'].lower() == 'admin' else False,
+                            is_staff=True if (row['role'].lower() == 'manager' or row['role'].lower() == 'admin') else False
+                        )
+                        pass
+                return Response(status=status.HTTP_201_CREATED)
+            except FileNotFoundError:
+                return Response({'error': 'CSV file not found'}, status=status.HTTP_400_BAD_REQUEST)
+            except ValidationError as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PunchRecordViewSet(viewsets.ModelViewSet):

@@ -2,7 +2,28 @@ from rest_framework import serializers
 from user.models import (
     User, PushRecord, TaskRecord
 )
-from task.models import Task
+# from task.models import Task
+# from task.serializers import TaskSerializer
+from rest_framework.parsers import FileUploadParser
+import os
+from datetime import datetime
+
+class CSVFileSerializer(serializers.Serializer):
+    csv_file = serializers.FileField()
+
+    def create(self, validated_data):
+        csv_file = validated_data['csv_file']
+        file_name = f"temp_user_{datetime.now()}.csv"
+        current_directory = os.getcwd()
+        file_directory = os.path.join(current_directory, 'static', 'temp')
+        os.makedirs(file_directory, exist_ok=True)
+        file_path = os.path.join(file_directory, file_name.replace(':', '_'))
+        
+        with open(file_path, 'wb+') as destination:
+            for chunk in csv_file.chunks():
+                destination.write(chunk)
+
+        return file_path
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
