@@ -71,7 +71,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
                             username=row['username'], 
                             email=row['email'], 
                             name=row['name'],
-                            password='Qwerty!2345678',
+                            password=row.get('password', 'Qwerty!2345678'),
                             is_superuser=True if row['role'].lower() == 'admin' else False,
                             is_staff=True if (row['role'].lower() == 'manager' or row['role'].lower() == 'admin') else False
                         )
