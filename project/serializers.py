@@ -33,17 +33,20 @@ class ProjectSerializer(serializers.ModelSerializer):
             response['leader'] = UserSerializer(team.leader).data
         return response
 
-class ProjectDetailSerializer(ProjectSerializer):
+class ProjectDetailSerializer(serializers.ModelSerializer):
 
     class Meta(ProjectSerializer.Meta):
-        fields = ProjectSerializer.Meta.fields
+        model = Project
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at', 'updated_at']
 
     def to_representation(self, instance):
         request = self.context.get('request')
         response = super().to_representation(instance)
         response['manager'] = UserSerializer(User.objects.get(pk=response['manager'])).data
         response['fabricator'] = FabricatorSerializer(Fabricator.objects.get(pk=response['fabricator'])).data
-        if request:
-            response['fabricator']['contract'] = request.build_absolute_uri(response['fabricator']['contract'])
         response['team'] = TeamDetailSerializer(Team.objects.get(pk=response['team'])).data
+        response['leader'] = response['team']['leader']
+        if request and 'contract' in response['fabricator']:
+            response['fabricator']['contract'] = request.build_absolute_uri(response['fabricator']['contract'])
         return response
