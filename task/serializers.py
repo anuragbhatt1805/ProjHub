@@ -7,7 +7,7 @@ from user.models import User
 from user.serializers import UserSerializer
 
 from project.models import Project
-from project.serializers import ProjectSerializer
+from project.serializers import ProjectDetailSerializer, ProjectSerializer
 
 from fabricator.models import Fabricator
 from fabricator.serializers import FabricatorSerializer
@@ -76,7 +76,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
         response['fabricator'] = FabricatorSerializer(Fabricator.objects.get(pk=response['fabricator'])).data
         if request:
             response['fabricator']['contract'] = request.build_absolute_uri(response['fabricator']['contract'])
-        response['project'] = ProjectSerializer(Project.objects.get(pk=response['project'])).data
+        response['project'] = ProjectDetailSerializer(Project.objects.get(pk=response['project'])).data
         response['user'] = UserSerializer(User.objects.get(pk=response['user'])).data
         if response['parent']:
             response['parent'] = TaskSerializer(Task.objects.get(pk=response['parent'])).data
