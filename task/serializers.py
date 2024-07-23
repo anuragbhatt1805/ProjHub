@@ -33,6 +33,7 @@ class AssignedListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
+        response['task'] = TaskSerializer(Task.objects.get(pk=response['task'])).data
         response['assigned_by'] = UserSerializer(User.objects.get(pk=response['assigned_by'])).data
         response['assigned_to'] = UserSerializer(User.objects.get(pk=response['assigned_to'])).data
         if response['approved']:
