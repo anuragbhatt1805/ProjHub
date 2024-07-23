@@ -90,6 +90,6 @@ class TaskRecordDetailSerializer(TaskRecordSerializer):
         response = super().to_representation(instance)
         response['task'] = TaskSerializer(Task.objects.get(pk=response['task']['id'])).data
         response['user'] = UserSerializer(response['user']).data
-        response['time taken'] = instance.get_total_time()
+        response['time_taken'] = instance.get_total_time()
         response['punches'] = PunchRecordSerializer(instance.get_punches(), many=True).data
         return response
