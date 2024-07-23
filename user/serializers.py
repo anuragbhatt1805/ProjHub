@@ -73,7 +73,7 @@ class TaskRecordSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['task'] = TaskSerializer(Task.objects.get(pk=response['task'])).data
         response['user'] = UserSerializer(User.objects.get(pk=response['user'])).data
-        response['time taken'] = instance.get_total_time()
+        response['time_taken'] = instance.get_total_time()
         return response
 
 class TaskRecordDetailSerializer(TaskRecordSerializer):
