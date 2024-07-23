@@ -1,7 +1,23 @@
 from rest_framework.serializers import ModelSerializer
-from user.models import User
-from user.serializers import UserSerializer
+from django.contrib.auth import get_user_model
+
 from team.models import Team, Member
+
+
+class UserSerializer(ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = [
+            'id', 'username', 'email', 'name',
+            'is_active', 'is_staff', 'is_superuser',
+            'password'
+        ]
+        extra_kwargs = {
+            'password' : {
+                'write_only':True,
+                'style':{'input_type':'password'}
+            }
+        }
 
 class MemberSerializer(ModelSerializer):
 
@@ -12,7 +28,7 @@ class MemberSerializer(ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['employee'] = UserSerializer(User.objects.get(pk=response['employee'])).data
+        response['employee'] = UserSerializer(get_user_model().objects.get(pk=response['employee'])).data
         return response
 
 class TeamSerializer(ModelSerializer):
@@ -24,8 +40,8 @@ class TeamSerializer(ModelSerializer):
     
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['created_by'] = UserSerializer(User.objects.get(pk=response['created_by'])).data
-        response['leader'] = UserSerializer(User.objects.get(pk=response['leader'])).data
+        response['created_by'] = UserSerializer(get_user_model().objects.get(pk=response['created_by'])).data
+        response['leader'] = UserSerializer(get_user_model().objects.get(pk=response['leader'])).data
         return response
 
 class TeamDetailSerializer(ModelSerializer):
@@ -38,6 +54,6 @@ class TeamDetailSerializer(ModelSerializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['members'] = MemberSerializer(Member.objects.filter(team=instance), many=True).data
-        response['created_by'] = UserSerializer(User.objects.get(pk=response['created_by'])).data
-        response['leader'] = UserSerializer(User.objects.get(pk=response['leader'])).data
+        response['created_by'] = UserSerializer(get_user_model().objects.get(pk=response['created_by'])).data
+        response['leader'] = UserSerializer(get_user_model().objects.get(pk=response['leader'])).data
         return response

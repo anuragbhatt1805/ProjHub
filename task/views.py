@@ -24,7 +24,7 @@ class CommentViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [SearchFilter]
     search_fields = ['task', 'data', 'user']
 
-class AssignedListViewSet(viewsets.ReadOnlyModelViewSet):
+class AssignedListViewSet(viewsets.ModelViewSet):
     queryset = AssignedList.objects.all()
     serializer_class = AssignedListSerializer
     authentication_classes = [TokenAuthentication, ]

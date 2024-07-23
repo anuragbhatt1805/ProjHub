@@ -55,17 +55,17 @@ class TaskRecord(models.Model):
 
     def add_start_punch(self):
         punch = PushRecord.objects.create(record=self, type='START')
-        task = Task.objects.get(self.task)
-        task.status = 'IN-PROGRESS'
-        task.save()
+        # task = Task.objects.get(self.task)
+        self.task.status = 'IN-PROGRESS'
+        self.task.save()
         punch.save()
         return punch
     
     def add_end_punch(self):
         punch = PushRecord.objects.create(record=self, type='END')
-        task = Task.objects.get(self.task)
-        task.status = 'IN-REVIEW'
-        task.save()
+        # task = Task.objects.get(self.task)
+        self.task.status = 'IN-REVIEW'
+        self.task.save()
         punch.save()
         return punch
     

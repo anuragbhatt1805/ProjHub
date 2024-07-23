@@ -1,13 +1,11 @@
 from rest_framework import serializers
 from project.models import Project, ProjectFile
-
-from user.serializers import UserSerializer
-from user.models import User
+from django.contrib.auth import get_user_model
 
 from fabricator.serializers import FabricatorSerializer
 from fabricator.models import Fabricator
 
-from team.serializers import TeamDetailSerializer
+from team.serializers import TeamDetailSerializer, UserSerializer
 from team.models import Team
 
 class ProjectFileSerializer(serializers.ModelSerializer):
@@ -25,7 +23,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['manager'] = UserSerializer(User.objects.get(pk=response['manager'])).data
+        response['manager'] = UserSerializer(get_user_model().objects.get(pk=response['manager'])).data
         response['fabricator'] = FabricatorSerializer(Fabricator.objects.get(pk=response['fabricator'])).data
         response['fabricator'].pop('contract')
         if response['team']:
@@ -43,7 +41,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         request = self.context.get('request')
         response = super().to_representation(instance)
-        response['manager'] = UserSerializer(User.objects.get(pk=response['manager'])).data
+        response['manager'] = UserSerializer(get_user_model().objects.get(pk=response['manager'])).data
         response['fabricator'] = FabricatorSerializer(Fabricator.objects.get(pk=response['fabricator'])).data
         if response['team']:
             response['team'] = TeamDetailSerializer(Team.objects.get(pk=response['team'])).data

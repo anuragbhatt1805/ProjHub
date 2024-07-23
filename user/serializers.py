@@ -2,8 +2,8 @@ from rest_framework import serializers
 from user.models import (
     User, PushRecord, TaskRecord
 )
-# from task.models import Task
-# from task.serializers import TaskSerializer
+from task.models import Task
+from task.serializers import TaskSerializer
 from rest_framework.parsers import FileUploadParser
 import os
 from datetime import datetime
@@ -69,12 +69,12 @@ class TaskRecordSerializer(serializers.ModelSerializer):
         validated_data['user'] = self.context['request'].user.id
         return super().create(validated_data)
     
-    # def to_representation(self, instance):
-    #     response = super().to_representation(instance)
-    #     response['task'] = TaskSerializer(Task.objects.get(pk=response['task'])).data
-    #     response['user'] = UserSerializer(User.objects.get(pk=response['user'])).data
-    #     response['time taken'] = instance.get_total_time()
-    #     return response
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['task'] = TaskSerializer(Task.objects.get(pk=response['task'])).data
+        response['user'] = UserSerializer(User.objects.get(pk=response['user'])).data
+        response['time taken'] = instance.get_total_time()
+        return response
 
 class TaskRecordDetailSerializer(TaskRecordSerializer):
     class Meta:
@@ -86,10 +86,10 @@ class TaskRecordDetailSerializer(TaskRecordSerializer):
         validated_data['user'] = self.context['request'].user.id
         return super().create(validated_data)
     
-    # def to_representation(self, instance):
-    #     response = super().to_representation(instance)
-    #     response['task'] = TaskSerializer(Task.objects.get(pk=response['task'])).data
-    #     response['user'] = UserSerializer(User.objects.get(pk=response['user'])).data
-    #     response['time taken'] = instance.get_total_time()
-    #     response['punches'] = PunchRecordSerializer(instance.get_punches(), many=True).data
-    #     return response
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['task'] = TaskSerializer(Task.objects.get(pk=response['task']['id'])).data
+        response['user'] = UserSerializer(response['user']).data
+        response['time taken'] = instance.get_total_time()
+        response['punches'] = PunchRecordSerializer(instance.get_punches(), many=True).data
+        return response
