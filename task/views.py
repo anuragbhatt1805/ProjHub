@@ -70,6 +70,15 @@ class TaskViewSet(viewsets.ModelViewSet):
             return AssignedListSerializer
         return super().get_serializer_class()
     
+    def get_queryset(self):
+        if self.request.user.is_superuser or self.request.user.is_staff:
+            project = self.request.query_params.get('project', None)
+            if project:
+                return super().get_queryset().filter(project__id=project)
+            return super().get_queryset()
+        # return super().get_queryset().filter(user=self.request.user)
+        return super().get_queryset().filter(user=self.request.user)
+    
     @action(detail=True, methods=['get', 'post'])
     def accept(self, request, pk=None):
         task = self.get_object()
@@ -90,9 +99,9 @@ class TaskViewSet(viewsets.ModelViewSet):
         user = request.user
         info = Task.objects.filter(
             user=user,
-            status__in=['ASSIGNED', 'IN-PROGRESS', 'BREAK']
+            status__in=['ASSINGED', 'IN-PROGRESS', 'BREAK']
         ).order_by('priority', 'created_on').first()
-        
+        print(user)
         if info:
             serializer = self.get_serializer(info)
             return Response(serializer.data, status=status.HTTP_302_FOUND)

@@ -28,7 +28,7 @@ class AssignedList(models.Model):
     assigned_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='assigned_by', verbose_name='Assigned By')
     assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='assigned_to', verbose_name='Assigned To')
     approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='approved_by', verbose_name='Approved By', blank=True, null=True)
-    approved_on = models.DateTimeField(auto_now=True, verbose_name='Approved On')
+    approved_on = models.DateTimeField(verbose_name='Approved On', null=True, blank=True)
     assigned_on = models.DateTimeField(auto_now_add=True, verbose_name='Assigned On')
     approved = models.BooleanField(default=False, verbose_name='Approval Status')
     comment = models.TextField(blank=True, verbose_name='Comment on Approval', null=True)
@@ -41,6 +41,9 @@ class AssignedList(models.Model):
             self.comment = comment
         self.approved = True
         self.save()
+        # task = Task.objects.get(pk=self.task)
+        self.task.user = self.assigned_to
+        self.task.save()
         return self
 
 
