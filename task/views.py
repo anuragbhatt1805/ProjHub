@@ -90,6 +90,9 @@ class TaskViewSet(viewsets.ModelViewSet):
             user=request.user
         )
         record.save()
+        # record.start()
+        task.status = "ON-HOLD"
+        task.save()
 
         data = TaskRecordDetailSerializer(record).data
         return Response(data, status=status.HTTP_200_OK)
@@ -99,9 +102,8 @@ class TaskViewSet(viewsets.ModelViewSet):
         user = request.user
         info = Task.objects.filter(
             user=user,
-            status__in=['ASSINGED', 'IN-PROGRESS', 'BREAK']
-        ).order_by('priority', 'created_on').first()
-        print(user)
+            status__in=['ASSINGED', 'IN-PROGRESS', 'BREAK', 'ON-HOLD']
+        ).order_by('-priority', 'created_on').first()
         if info:
             serializer = self.get_serializer(info)
             return Response(serializer.data, status=status.HTTP_302_FOUND)
@@ -113,7 +115,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         user = request.user
         info = Task.objects.filter(
             user=user,
-            status__in=['ASSIGNED', 'IN-PROGRESS', 'BREAK']
+            status__in=['ASSIGNED', 'IN-PROGRESS', 'BREAK', 'ON-HOLD']
         ).order_by('priority', 'created_on')
         
         if info:
@@ -148,7 +150,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         if not assigned_to:
             return Response({'detail':'Assigned To field is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        comment = request.data.get('comment')
+        comment = request.data.get('comment', "")
 
         assignList = task.add_assignes(
             assigned_by = assigned_by,
@@ -170,6 +172,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             user = User.objects.filter(
                 username__in=[user, f'WBT-{user}', f'wbt-{user}']
             ).first()
-        queryset = queryset.filter(user=user, created_on__lte=date, due_date__gte=date)
+        queryset = queryset.filter(user=user, created_on__lte=date, due_date__gte=date,
+                    status__in=['ASSIGNED', 'IN-PROGRESS', 'BREAK', 'ON-HOLD'])
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

@@ -43,6 +43,7 @@ class AssignedList(models.Model):
         self.save()
         # task = Task.objects.get(pk=self.task)
         self.task.user = self.assigned_to
+        self.task.status = "ASSINGED"
         self.task.save()
         return self
 

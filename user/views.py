@@ -98,6 +98,18 @@ class TaskRecordViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter, )
     search_fields = ('task', 'user')
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.query_params.get('user', None)
+        if not user:
+            user = self.request.user
+        else:
+            user = User.objects.filter(
+                username__in=[user, f'WBT-{user}', f'wbt-{user}']
+            ).first()
+        queryset = queryset.filter(user=user)
+        return queryset
+
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return TaskRecordDetailSerializer
