@@ -33,6 +33,10 @@ class ProjectAdmin(admin.ModelAdmin):
             'manager', 'team', 'fabricator', ],
             'classes': ('wide',),
         }),
+        ('Project Tools', {'fields': [
+            'tool', ],
+            'classes': ('wide',),
+        }),
         ('Project Dates', {'fields': [
             'startDate', 'endDate', 'duration'],
             'classes': ('shrink',),

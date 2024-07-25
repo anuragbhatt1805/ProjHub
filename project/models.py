@@ -26,6 +26,10 @@ class Project(models.Model):
     startDate = models.DateTimeField(verbose_name='Start Date')
     endDate = models.DateTimeField(null=True, verbose_name='Approval Date')
     duration = models.IntegerField(null=True, blank=True, default=1)
+    tool = models.CharField(max_length=20, default=None, choices=[
+        ('TEKLA', 'TEKLA'),
+        ('SDS-2', 'SDS-2')
+    ], blank=True, null=True, verbose_name='Tools')
     status = models.CharField(max_length=55, default='ACTIVE', choices=[
         ('ACTIVE', 'Active'),
         ('ON-HOLD', 'On-Hold'),
