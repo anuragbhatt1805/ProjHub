@@ -1,21 +1,6 @@
 from django.contrib import admin
-from fabricator.models import Fabricator
+from fabricator.models import Fabricator, ContactPerson
 
-class FabricatorAdmin(admin.ModelAdmin):
-    ordering = ['name', 'contactPerson',]
-    search_fields = ['name', 'contactPerson', 'contactPhone']
-    list_display = ['name', 'contactPerson', 'contactPhone', 'contactCountry']
-    list_filter = ['contactCountry', 'contactState', 'contactCity', 'contactPerson']    
-    fieldsets = (
-        ('Fabricator', {
-            'fields': ['name']
-        }),
-        ('Contact Person Info', {
-            'fields': ['contactPerson', 'contactPhone', 'contactCountry', 'contactState', 'contactCity']
-        }),
-        ('Contract Details', {
-            'fields': ['contract']
-        })
-    )
 
-admin.site.register(Fabricator, FabricatorAdmin)
+admin.site.register(Fabricator)
+admin.site.register(ContactPerson)

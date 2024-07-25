@@ -51,8 +51,6 @@ class TaskSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         response = super().to_representation(instance)
         response['fabricator'] = FabricatorSerializer(Fabricator.objects.get(pk=response['fabricator'])).data
-        if request:
-            response['fabricator']['contract'] = request.build_absolute_uri(response['fabricator']['contract'])
         response['project'] = ProjectSerializer(Project.objects.get(pk=response['project'])).data
         response['user'] = UserSerializer(get_user_model().objects.get(pk=response['user'])).data
         return response
@@ -78,8 +76,6 @@ class TaskDetailSerializer(serializers.ModelSerializer):
         if record.exists():
             response['record'] = record.first().id
         response['fabricator'] = FabricatorSerializer(Fabricator.objects.get(pk=response['fabricator'])).data
-        if request:
-            response['fabricator']['contract'] = request.build_absolute_uri(response['fabricator']['contract'])
         response['project'] = ProjectDetailSerializer(Project.objects.get(pk=response['project'])).data
         response['user'] = UserSerializer(get_user_model().objects.get(pk=response['user'])).data
         if response['parent']:

@@ -25,7 +25,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['manager'] = UserSerializer(get_user_model().objects.get(pk=response['manager'])).data
         response['fabricator'] = FabricatorSerializer(Fabricator.objects.get(pk=response['fabricator'])).data
-        response['fabricator'].pop('contract')
         if response['team']:
             team = Team.objects.get(pk=response['team'])
             response['leader'] = UserSerializer(team.leader).data
@@ -46,6 +45,4 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
         if response['team']:
             response['team'] = TeamDetailSerializer(Team.objects.get(pk=response['team'])).data
             response['leader'] = response['team']['leader']
-        if request and 'contract' in response['fabricator'] and response['fabricator']['contract']:
-            response['fabricator']['contract'] = request.build_absolute_uri(response['fabricator']['contract'])
         return response

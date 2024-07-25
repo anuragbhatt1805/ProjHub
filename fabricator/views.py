@@ -3,7 +3,12 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from fabricator.models import Fabricator
 from fabricator.permissions import UpdateFabricator
-from fabricator.serializers import FabricatorSerializer, CSVFileSerializer
+from fabricator.serializers import (
+    FabricatorSerializer,
+    FabricatorDetailSerializer,
+    CSVFileSerializer,
+    ContactPersonSerializer
+)
 from rest_framework.response import Response
 from django.core.exceptions import ValidationError
 from django.http import FileResponse
@@ -12,26 +17,6 @@ import os, csv
 
 
 class FabricatorModelViewSet(viewsets.ModelViewSet):
-    """
-    A viewset for managing fabricator objects.
-
-    This viewset provides CRUD operations for fabricator objects,
-    as well as additional actions for handling CSV files.
-
-    Attributes:
-        serializer_class (Serializer): The serializer class for fabricator objects.
-        queryset (QuerySet): The queryset for fabricator objects.
-        authentication_classes (tuple): The authentication classes for the viewset.
-        permission_classes (tuple): The permission classes for the viewset.
-        filter_backends (tuple): The filter backends for the viewset.
-        search_fields (tuple): The fields to search for fabricator objects.
-
-    Methods:
-        get_serializer_class: Returns the serializer class based on the action.
-        get_sample_csv: Retrieves a sample CSV file for the Fabricator.
-        add_csv: Add fabricator data from a CSV file.
-    """
-
     serializer_class = FabricatorSerializer
     queryset = Fabricator.objects.all()
     authentication_classes = (TokenAuthentication, )
@@ -40,28 +25,19 @@ class FabricatorModelViewSet(viewsets.ModelViewSet):
     search_fields = ('name', 'contactPerson', 'contactCountry', 'contactState', 'contactCity')
 
     def get_serializer_class(self):
-        """
-        Returns the serializer class based on the action.
-
-        Returns:
-            Serializer: The serializer class for the action.
-        """
+        if self.action == 'retrieve':
+            return FabricatorDetailSerializer
         if self.action == 'add_csv' or self.action == 'get_sample_csv':
             return CSVFileSerializer
+        if self.action in [
+            'update_connection', 'remove_connection',
+            'get_connection', 'add_connection'
+        ] :
+            return ContactPersonSerializer
         return super().get_serializer_class()
 
     @action(detail=False, methods=['get'])
     def get_sample_csv(self, request, pk=None):
-        """
-        Retrieves a sample CSV file for the Fabricator.
-
-        Args:
-            request (HttpRequest): The HTTP request object.
-            pk (str, optional): The primary key of the object. Defaults to None.
-
-        Returns:
-            FileResponse: The HTTP response containing the sample CSV file.
-        """
         file_path = os.path.join(os.getcwd(), 'static', 'temp', 'fabricator_sample.csv')
         return FileResponse(
             open(file_path, 'rb'),
@@ -73,16 +49,6 @@ class FabricatorModelViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['post', 'get'])
     def add_csv(self, request, pk=None):
-        """
-        Add fabricator data from a CSV file.
-
-        Args:
-            request (HttpRequest): The HTTP request object.
-            pk (int, optional): The primary key of the fabricator object. Defaults to None.
-
-        Returns:
-            Response: The HTTP response indicating the result of the operation.
-        """
         serializer = CSVFileSerializer(data=request.data)
         if serializer.is_valid():
             file_path = serializer.save()
@@ -105,5 +71,37 @@ class FabricatorModelViewSet(viewsets.ModelViewSet):
                 return Response({'error': 'CSV file not found'}, status=status.HTTP_400_BAD_REQUEST)
             except ValidationError as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=True, methods=['post',])
+    def add_connection(self, request, pk=None):
+        fabricator = self.get_object()
+        serializer = ContactPersonSerializer(data=request.data)
+        if serializer.is_valid():
+            fabricator.add_contact_person(**serializer.validated_data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['get'])
+    def get_connection(self, request, pk=None):
+        fabricator = self.get_object()
+        serializer = ContactPersonSerializer(fabricator.get_contact_person(), many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['delete', 'get'], url_path='remove_connection/(?P<id>[^/.]+)')
+    def remove_connection(self, request, pk=None, id=None):
+        fabricator = self.get_object()
+        fabricator.remove_contact_person(id)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(detail=True, methods=['GET', 'PUT', 'POST', 'PATCH'], url_path='update_connection/(?P<id>[^/.]+)')
+    def update_connection(self, request, pk=None, id=None):
+        fabricator = self.get_object()
+        serializer = ContactPersonSerializer(data=request.data)
+        if serializer.is_valid():
+            fabricator.update_contact_person(id, **serializer.validated_data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
