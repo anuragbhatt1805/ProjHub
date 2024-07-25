@@ -51,6 +51,8 @@ class Project(models.Model):
         ('RIF', 'Request for Information'),
         ('REV', 'Revision'),
     ], blank=True, null=True, verbose_name='Project Stage')
+    connectionDesign = models.BooleanField(default=False, verbose_name="Connection Design")
+    miscDesign = models.BooleanField(default=False, verbose_name="Misc Design")
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True  )
     objects = models.Manager()
