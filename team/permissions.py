@@ -8,7 +8,7 @@ class IsSuperuserOrReadOnly(permissions.BasePermission):
             return True
         
         # Only allow POST (create project) for superusers.
-        return request.user.is_superuser
+        return request.user.is_superuser or request.user.is_staff
 
     def has_object_permission(self, request, view, obj):
         # Allow read permissions for all requests.

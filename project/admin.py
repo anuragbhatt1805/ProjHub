@@ -34,7 +34,7 @@ class ProjectAdmin(admin.ModelAdmin):
             'classes': ('wide',),
         }),
         ('Project Dates', {'fields': [
-            'startDate', 'endDate', ],
+            'startDate', 'endDate', 'duration'],
             'classes': ('shrink',),
         }),
         ('Project Status', {'fields': [

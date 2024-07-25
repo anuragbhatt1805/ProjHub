@@ -24,7 +24,8 @@ class Project(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name='Team', blank=True, null=True,)
     fabricator = models.ForeignKey(Fabricator, on_delete=models.CASCADE, related_name='fabricator', verbose_name='Fabricator')
     startDate = models.DateTimeField(verbose_name='Start Date')
-    endDate = models.DateTimeField(null=True, verbose_name='End Date')
+    endDate = models.DateTimeField(null=True, verbose_name='Approval Date')
+    duration = models.IntegerField(null=True, blank=True, default=1)
     status = models.CharField(max_length=55, default='ACTIVE', choices=[
         ('ACTIVE', 'Active'),
         ('ON-HOLD', 'On-Hold'),

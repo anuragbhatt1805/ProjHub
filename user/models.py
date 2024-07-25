@@ -71,11 +71,15 @@ class TaskRecord(models.Model):
     
     def add_resume_punch(self):
         punch = PushRecord.objects.create(record=self, type='RESUME')
+        self.task.status = 'IN-PROGRESS'
+        self.task.save()
         punch.save()
         return punch
     
     def add_suspend_record(self):
         punch = PushRecord.objects.create(record=self, type='SUSPEND')
+        self.task.status = 'BREAK'
+        self.task.save()
         punch.save()
         return punch
     

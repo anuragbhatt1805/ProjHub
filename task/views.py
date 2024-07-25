@@ -102,7 +102,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         user = request.user
         info = Task.objects.filter(
             user=user,
-            status__in=['ASSINGED', 'IN-PROGRESS', 'BREAK', 'ON-HOLD']
+            status__in=['IN-PROGRESS', 'BREAK']
         ).order_by('-priority', 'created_on').first()
         if info:
             serializer = self.get_serializer(info)
@@ -115,8 +115,8 @@ class TaskViewSet(viewsets.ModelViewSet):
         user = request.user
         info = Task.objects.filter(
             user=user,
-            status__in=['ASSIGNED', 'IN-PROGRESS', 'BREAK', 'ON-HOLD']
-        ).order_by('priority', 'created_on')
+            status__in=['ASSINGED', 'IN-PROGRESS', 'BREAK', 'ON-HOLD']
+        ).order_by('-priority', 'created_on')
         
         if info:
             serializer = self.get_serializer(info, many=True)
