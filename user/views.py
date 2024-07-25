@@ -36,6 +36,11 @@ class UserModelViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', 'username', 'email', 'is_staff', 'is_superuser')
 
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return super().get_queryset()
+        return super().get_queryset().filter(is_superuser=False)
+
     def get_serializer_class(self):
         if self.action == 'add_csv' or self.action == 'get_sample_csv':
             return CSVFileSerializer

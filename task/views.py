@@ -49,6 +49,10 @@ class AssignedListViewSet(viewsets.ModelViewSet):
             return Response({'detail': 'Already Confirmed'}, status=status.HTTP_400_BAD_REQUEST)
         comment = request.data.get('comment')
         assign.confirm(approved_by=request.user, comment=comment)
+        record = TaskRecord.objects.filter(user=request.user, task=assign.task).first()
+        if record:
+            record.add_end_punch()
+            record.save()
         res = AssignedListSerializer(assign).data
         return Response(res, status=status.HTTP_200_OK)  
 
@@ -118,11 +122,8 @@ class TaskViewSet(viewsets.ModelViewSet):
             status__in=['ASSINGED', 'IN-PROGRESS', 'BREAK', 'ON-HOLD']
         ).order_by('-priority', 'created_on')
         
-        if info:
-            serializer = self.get_serializer(info, many=True)
-            return Response(serializer.data, status=status.HTTP_302_FOUND)
-        else:
-            return Response({'detail': 'No tasks found'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(info, many=True)
+        return Response(serializer.data, status=status.HTTP_302_FOUND)
         
     @action(detail=True, methods=['get', 'post'])
     def add_comment(self, request, pk=None):
