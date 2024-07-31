@@ -24,6 +24,10 @@ class FabricatorModelViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', 'contactPerson', 'contactCountry', 'contactState', 'contactCity')
 
+    def create(self, request):
+        print(request.data)
+        return super().create(request)
+
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return FabricatorDetailSerializer

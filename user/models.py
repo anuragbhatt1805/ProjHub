@@ -113,3 +113,4 @@ class TaskRecord(models.Model):
                 total_time += (end_time - start_time).total_seconds()
 
             return total_time
+     

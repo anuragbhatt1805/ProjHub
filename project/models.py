@@ -50,6 +50,7 @@ class Project(models.Model):
         ('RIFC', 'Re-issue for Construction'),
         ('RIF', 'Request for Information'),
         ('REV', 'Revision'),
+        ('CO#', 'Completed')
     ], blank=True, null=True, verbose_name='Project Stage')
     connectionDesign = models.BooleanField(default=False, verbose_name="Connection Design")
     miscDesign = models.BooleanField(default=False, verbose_name="Misc Design")

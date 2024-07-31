@@ -88,7 +88,7 @@ class Task(models.Model):
         ('IN-REVIEW', 'In Review'),
         ('COMPLETE', 'Completed'),
         ('APPROVED', 'Approved')
-    ], default='ASSIGNED')
+    ], default='ASSIGNED')  
     attachment = models.FileField(upload_to=uploadTaskFile, null=True, blank=True, verbose_name='Attachment')
     priority = models.IntegerField(blank=False, verbose_name='Priority', choices=TaskPriority.choices, default=TaskPriority.NORMAL)
     created_on = models.DateTimeField(auto_now_add=True)
