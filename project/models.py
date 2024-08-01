@@ -42,13 +42,15 @@ class Project(models.Model):
         ('CANCEL', 'Cancel'),
     ], blank=True, null=True, verbose_name='Project Status')
     stage = models.CharField(max_length=55, default='IFA', choices=[
+        ('RFI', 'Request for Information'),
         ('IFA', 'Issue for Approval'),
         ('BFA', 'Back from Approval'),
+        ('BFA-M', 'Back from Approval - Markup'),
         ('RIFA', 'Re-issue for Approval'),
+        ('RBFA', 'Return Back from Approval'),
         ('IFC', 'Issue for Construction'),
         ('BFC', 'Back from Construction'),
         ('RIFC', 'Re-issue for Construction'),
-        ('RIF', 'Request for Information'),
         ('REV', 'Revision'),
         ('CO#', 'Completed')
     ], blank=True, null=True, verbose_name='Project Stage')

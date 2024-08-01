@@ -29,8 +29,6 @@ DEBUG = True
 ALLOWED_HOSTS = [ f'192.168.1.{i}' for i in range(1, 256) ] + [
     'localhost',
     '127.0.0.1',
-    'https://projhub-no23.onrender.com',
-    'projhub-no23.onrender.com',
 ]
 
 # Application definition
