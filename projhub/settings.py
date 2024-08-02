@@ -159,7 +159,7 @@ AUTHENTICATION_BACKENDS = [
 
 
 # The URL of the LDAP server(s).  List multiple servers for high availability ServerPool connection.
-LDAP_AUTH_URL = ["ldap://192.168.1.207:389"]
+LDAP_AUTH_URL = ["ldap://192.168.1.207:3268"]
 
 # Initiate TLS on connection.
 LDAP_AUTH_USE_TLS = False
@@ -175,7 +175,8 @@ LDAP_AUTH_TLS_CIPHERS = "ALL"
 LDAP_AUTH_TLS_ARGS = {}
 
 # The LDAP search base for looking up users.
-LDAP_AUTH_SEARCH_BASE = "CN=TaskSrv,OU=WBTPL Software User,OU=WBTPL Software,DC=WBTPL,DC=COM"
+LDAP_AUTH_SEARCH_BASE = "DC=WBTPL,DC=COM"
+# LDAP_AUTH_SEARCH_BASE = ""
 
 # The LDAP class that represents a user.
 LDAP_AUTH_OBJECT_CLASS = "inetOrgPerson"
@@ -219,8 +220,10 @@ LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
 # The LDAP username and password of a user for querying the LDAP database for user
 # details. If None, then the authenticated user will be used for querying, and
 # the `ldap_sync_users`, `ldap_clean_users` commands will perform an anonymous query.
-LDAP_AUTH_CONNECTION_USERNAME = 'tsksrv'
-LDAP_AUTH_CONNECTION_PASSWORD = 'K@02md8769$!'
+# LDAP_AUTH_CONNECTION_USERNAME = 'wbtpl@tasksrv'
+# LDAP_AUTH_CONNECTION_PASSWORD = 'K@02md8769$!'
+LDAP_AUTH_CONNECTION_USERNAME = None
+LDAP_AUTH_CONNECTION_PASSWORD = None
 
 # Use SSL on the connection.
 LDAP_AUTH_CONNECT_USE_SSL = False
