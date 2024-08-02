@@ -40,7 +40,7 @@ class TeamSerializer(ModelSerializer):
     
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        # response['created_by'] = UserSerializer(get_user_model().objects.get(pk=response['created_by'])).data
+        response['created_by'] = UserSerializer(get_user_model().objects.get(pk=response['created_by'])).data
         response['leader'] = UserSerializer(get_user_model().objects.get(pk=response['leader'])).data
         return response
 
@@ -54,6 +54,6 @@ class TeamDetailSerializer(ModelSerializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['members'] = MemberSerializer(Member.objects.filter(team=instance), many=True).data
-        # response['created_by'] = UserSerializer(get_user_model().objects.get(pk=response['created_by'])).data
+        response['created_by'] = UserSerializer(get_user_model().objects.get(pk=response['created_by'])).data
         response['leader'] = UserSerializer(get_user_model().objects.get(pk=response['leader'])).data
         return response
