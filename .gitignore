@@ -16,6 +16,7 @@ media
 /static/comment
 /static/contracts
 /static/project
+/static/designStandard
 /static/task
 # /static
 # static/.
