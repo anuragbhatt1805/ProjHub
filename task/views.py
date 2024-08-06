@@ -12,6 +12,7 @@ from task.serializers import (
     TaskSerializer, TaskDetailSerializer
 )
 from user.models import TaskRecord, User
+from django.db.models import Q
 from user.serializers import TaskRecordDetailSerializer
 from datetime import date as today
 
@@ -171,7 +172,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             user = request.user
         else:
             user = User.objects.filter(
-                username__in=[user, f'WBT-{user}', f'wbt-{user}']
+                Q(username=user) | Q(name__icontains=user) | Q(username=f'WBT-{user}') | Q(username=f'wbt-{user}')
             ).first()
         queryset = queryset.filter(user=user, created_on__lte=date,
                     status__in=['ASSIGNED', 'IN-PROGRESS', 'BREAK', 'ON-HOLD'])
