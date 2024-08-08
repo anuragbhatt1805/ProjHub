@@ -72,7 +72,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
                 with open(file_path, 'r') as file:
                     reader = csv.DictReader(file)
                     for row in reader:
-                        User.objects.create(
+                        User.objects.create_user(
                             username=row['username'], 
                             email=row['email'], 
                             name=row['name'],
