@@ -9,7 +9,6 @@ from task.models import Task
 
 class UserManager(BaseUserManager):
     def create_user(self, password=None, **kwargs):
-        kwargs['email'] = self.normalize_email(kwargs.get('email'))
         user = self.model(**kwargs)
         user.set_password(password)
         user.save(using=self._db)
@@ -25,7 +24,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=150, unique=True, verbose_name='Username')
     name = models.CharField(max_length=150, null=True, verbose_name='Full Name')
-    email = models.EmailField(max_length=255, unique=True, null=True, verbose_name='Email Address')
+    email = models.EmailField(max_length=255, null=True, verbose_name='Email Address')
     is_active = models.BooleanField(default=True, verbose_name='Active')
     is_staff = models.BooleanField(default=False, verbose_name='Manager')
     is_superuser = models.BooleanField(default=False, verbose_name='Admin')

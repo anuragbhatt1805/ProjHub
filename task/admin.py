@@ -136,7 +136,7 @@ class CommentAdmin(admin.ModelAdmin):
     get_task_name.short_description = 'Task'
 
     def get_user_name(self, obj):
-        return obj.user.get_full_name()  # Assuming user model has get_full_name method
+        return obj.user.name  # Assuming user model has get_full_name method
     get_user_name.short_description = 'User'
 
     list_display = ['get_task_name', 'get_user_name', 'data']

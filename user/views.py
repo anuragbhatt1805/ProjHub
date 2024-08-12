@@ -72,14 +72,18 @@ class UserModelViewSet(viewsets.ModelViewSet):
                 with open(file_path, 'r') as file:
                     reader = csv.DictReader(file)
                     for row in reader:
-                        User.objects.create_user(
-                            username=row['username'], 
-                            email=row['email'], 
-                            name=row['name'],
-                            password=row.get('password', 'Qwerty!2345678'),
-                            is_superuser=True if row['role'].lower() == 'admin' else False,
-                            is_staff=True if (row['role'].lower() == 'manager' or row['role'].lower() == 'admin') else False
-                        )
+                        try:
+                            User.objects.create_user(
+                                username=row['username'], 
+                                email=row['email'], 
+                                name=row['name'],
+                                password=row.get('password', 'Qwerty!2345678'),
+                                is_superuser=True if row['role'].lower() == 'admin' else False,
+                                is_staff=True if (row['role'].lower() == 'manager' or row['role'].lower() == 'admin') else False
+                            )
+                        except Exception as e:
+                            print(e)
+                            continue
                 return Response(status=status.HTTP_201_CREATED)
             except FileNotFoundError:
                 return Response({'error': 'CSV file not found'}, status=status.HTTP_400_BAD_REQUEST)

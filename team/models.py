@@ -31,19 +31,13 @@ class TeamManager(models.Manager):
             employee = team.leader
         )
         leadMember.save()
-        managerMember = Member.objects.create(
-            team = team,
-            role = 'MANAGER',
-            employee = team.created_by
-        )
-        managerMember.save()
         return team
 
 
 class Team(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, verbose_name='Team Name')
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_by', verbose_name='Team Manager')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_by', verbose_name='Team Manager', null=True, blank=True)
     leader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='team_leader', verbose_name='Team Leader')
     created_at = models.DateTimeField(auto_now_add=True)
     objects = TeamManager()
