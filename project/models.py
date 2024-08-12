@@ -56,6 +56,7 @@ class Project(models.Model):
     ], blank=True, null=True, verbose_name='Project Stage')
     connectionDesign = models.BooleanField(default=False, verbose_name="Connection Design")
     miscDesign = models.BooleanField(default=False, verbose_name="Misc Design")
+    customer = models.BooleanField(default=False, verbose_name="Customer")
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True  )
     objects = models.Manager()
