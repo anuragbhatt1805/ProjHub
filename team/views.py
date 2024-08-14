@@ -81,9 +81,9 @@ class TeamViewSet(ModelViewSet):
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(role)
 
-    def create(self, request, *args, **kwargs):
-        manager = request.data.get('manager')
-        if not manager:
-            manager = request.user
-        request.data['created_by'] = manager
-        return super().create(request, *args, **kwargs)
+    # def create(self, request, *args, **kwargs):
+    #     manager = request.data.get('manager')
+    #     if not manager:
+    #         manager = request.user
+    #     request.data['created_by'] = manager
+    #     return super().create(request, *args, **kwargs)

@@ -38,7 +38,7 @@ class ProjectAdmin(admin.ModelAdmin):
             'classes': ('wide',),
         }),
         ('Project Details', {'fields': [
-            'tool', 'connectionDesign', 'miscDesign'],
+            'tool', 'connectionDesign', 'miscDesign', 'customer'],
             'classes': ('wide',),
         }),
         ('Project Dates', {'fields': [

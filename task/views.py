@@ -175,6 +175,6 @@ class TaskViewSet(viewsets.ModelViewSet):
                 Q(username=user) | Q(name__icontains=user) | Q(username=f'WBT-{user}') | Q(username=f'wbt-{user}')
             ).first()
         queryset = queryset.filter(user=user, created_on__lte=date,
-                    status__in=['ASSIGNED', 'IN-PROGRESS', 'BREAK', 'ON-HOLD'])
+                    status__in=['ASSINGED', 'IN-PROGRESS', 'BREAK', 'ON-HOLD'])
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

@@ -73,13 +73,14 @@ class UserModelViewSet(viewsets.ModelViewSet):
                     reader = csv.DictReader(file)
                     for row in reader:
                         try:
+                            print(row['username'], " : ", row['role'].lower())
                             User.objects.create_user(
-                                username=row['username'], 
+                                username=row['username'].upper(), 
                                 email=row['email'], 
                                 name=row['name'],
                                 password=row.get('password', 'Qwerty!2345678'),
-                                is_superuser=True if row['role'].lower() == 'admin' else False,
-                                is_staff=True if (row['role'].lower() == 'manager' or row['role'].lower() == 'admin') else False
+                                is_superuser=True if row['role'].strip().lower() == 'admin' else False,
+                                is_staff=True if (row['role'].strip().lower() == 'manager' or row['role'].strip().lower() == 'admin') else False
                             )
                         except Exception as e:
                             print(e)

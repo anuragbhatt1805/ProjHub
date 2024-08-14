@@ -11,6 +11,11 @@ class UserManager(BaseUserManager):
     def create_user(self, password=None, **kwargs):
         user = self.model(**kwargs)
         user.set_password(password)
+        try: 
+            user.is_superuser = kwargs['is_superuser']
+            user.is_staff = kwargs['is_staff']
+        except:
+            print("None")
         user.save(using=self._db)
         return user
 
